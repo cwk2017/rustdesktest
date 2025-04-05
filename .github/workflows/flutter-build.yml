@@ -135,6 +135,7 @@ jobs:
         with:
           vcpkgDirectory: C:\vcpkg
           vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotUpdateVcpkg: true
           doNotCache: false
 
       - name: Install vcpkg dependencies
@@ -328,6 +329,7 @@ jobs:
         with:
           vcpkgDirectory: C:\vcpkg
           vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotUpdateVcpkg: true
           doNotCache: false
 
       - name: Install vcpkg dependencies
@@ -1022,6 +1024,7 @@ jobs:
         with:
           vcpkgDirectory: /opt/artifacts/vcpkg
           vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotUpdateVcpkg: true
           doNotCache: false
 
       - name: Install vcpkg dependencies
