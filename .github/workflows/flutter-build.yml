@@ -510,7 +510,8 @@ jobs:
           - {
               arch: aarch64,
               target: aarch64-apple-ios,
-              os: macos-13,
+              os: macos-latest,
+              extra-build-args: "--screencapturekit",
               vcpkg-triplet: arm64-ios,
             }
     steps:
@@ -685,8 +686,8 @@ jobs:
         job:
           - {
               target: x86_64-apple-darwin,
-              os: macos-13, #macos-latest or macos-14 use M1 now, https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#:~:text=14%20GB-,macos%2Dlatest%20or%20macos%2D14,-The%20macos%2Dlatestlabel
-              extra-build-args: "",
+              os: macos-latest, #macos-latest or macos-14 use M1 now, https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#:~:text=14%20GB-,macos%2Dlatest%20or%20macos%2D14,-The%20macos%2Dlatestlabel
+              extra-build-args: "--screencapturekit",
               arch: x86_64,
               vcpkg-triplet: x64-osx,
             }
@@ -929,21 +930,21 @@ jobs:
           - {
               arch: aarch64,
               target: aarch64-linux-android,
-              os: ubuntu-20.04,
+              os: ubuntu-22.04,
               reltype: release,
               suffix: "",
             }
           - {
               arch: armv7,
               target: armv7-linux-androideabi,
-              os: ubuntu-20.04,
+              os: ubuntu-22.04,
               reltype: release,
               suffix: "",
             }
           - {
               arch: x86_64,
               target: x86_64-linux-android,
-              os: ubuntu-20.04,
+              os: ubuntu-22.04,
               reltype: release,
               suffix: "",
             }
@@ -968,6 +969,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev sudo
           sudo apt-get update
           sudo apt-get install -y \
                clang \
@@ -1211,7 +1217,7 @@ jobs:
     needs: [build-rustdesk-android]
     name: build rustdesk android universal apk
     if: ${{ inputs.upload-artifact }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       reltype: release
       x86_target: "" # can be ",android-x86"
@@ -1237,6 +1243,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev sudo        
           sudo apt-get update
           sudo apt-get install -y \
                clang \
@@ -1525,6 +1536,7 @@ jobs:
           shell: /bin/bash
           install: |
             apt-get update -y
+            apt-get install -y libunwind-dev sudo
             echo -e "installing deps"
             apt-get install -y \
                build-essential \
@@ -1797,6 +1809,7 @@ jobs:
           shell: /bin/bash
           install: |
             apt-get update
+            apt-get install -y libunwind-dev sudo
             apt-get install -y \
                build-essential \
                clang \
@@ -1944,7 +1957,7 @@ jobs:
   build-appimage:
     name: Build appimage ${{ matrix.job.target }}
     needs: [build-rustdesk-linux]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: ${{ inputs.upload-artifact }}
     strategy:
       fail-fast: false
@@ -1972,6 +1985,8 @@ jobs:
         shell: bash
         run: |
           # install libarchive-tools for bsdtar command used in AppImageBuilder.yml
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev sudo libfuse2  
           sudo apt-get update -y
           sudo apt-get install -y libarchive-tools
           # set-up appimage-builder
@@ -2056,6 +2071,7 @@ jobs:
           shell: /bin/bash
           install: |
             apt-get update -y
+            apt-get install -y libunwind-dev sudo wget
             apt-get install -y git flatpak flatpak-builder
           run: |
             # disable git safe.directory
