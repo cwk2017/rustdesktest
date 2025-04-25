@@ -510,7 +510,8 @@ jobs:
           - {
               arch: aarch64,
               target: aarch64-apple-ios,
-              os: macos-13,
+              os: macos-latest,
+              extra-build-args: "--screencapturekit",
               vcpkg-triplet: arm64-ios,
             }
     steps:
@@ -685,8 +686,8 @@ jobs:
         job:
           - {
               target: x86_64-apple-darwin,
-              os: macos-13, #macos-latest or macos-14 use M1 now, https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#:~:text=14%20GB-,macos%2Dlatest%20or%20macos%2D14,-The%20macos%2Dlatestlabel
-              extra-build-args: "",
+              os: macos-latest, #macos-latest or macos-14 use M1 now, https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#:~:text=14%20GB-,macos%2Dlatest%20or%20macos%2D14,-The%20macos%2Dlatestlabel
+              extra-build-args: "--screencapturekit",
               arch: x86_64,
               vcpkg-triplet: x64-osx,
             }
@@ -968,6 +969,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev sudo
           sudo apt-get update
           sudo apt-get install -y \
                clang \
@@ -980,8 +986,7 @@ jobs:
                libayatana-appindicator3-dev \
                libasound2-dev \
                libc6-dev \
-               libclang-11-dev \
-               libunwind-dev \
+               libclang-10-dev \
                libgstreamer1.0-dev \
                libgstreamer-plugins-base1.0-dev \
                libgtk-3-dev \
@@ -993,7 +998,7 @@ jobs:
                libxcb-xfixes0-dev \
                libxdo-dev \
                libxfixes-dev \
-               llvm-11-dev \
+               llvm-10-dev \
                nasm \
                ninja-build \
                openjdk-17-jdk-headless \
@@ -1238,6 +1243,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main" | sudo tee -a /etc/apt/sources.list > /dev/null
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev sudo        
           sudo apt-get update
           sudo apt-get install -y \
                clang \
@@ -1250,8 +1260,7 @@ jobs:
                libayatana-appindicator3-dev \
                libasound2-dev \
                libc6-dev \
-               libclang-11-dev \
-               libunwind-dev \
+               libclang-10-dev \
                libgstreamer1.0-dev \
                libgstreamer-plugins-base1.0-dev \
                libgtk-3-dev \
@@ -1263,7 +1272,7 @@ jobs:
                libxcb-xfixes0-dev \
                libxdo-dev \
                libxfixes-dev \
-               llvm-11-dev \
+               llvm-10-dev \
                nasm \
                ninja-build \
                openjdk-17-jdk-headless \
@@ -1527,6 +1536,7 @@ jobs:
           shell: /bin/bash
           install: |
             apt-get update -y
+            apt-get install -y libunwind-dev sudo
             echo -e "installing deps"
             apt-get install -y \
                build-essential \
@@ -1799,6 +1809,7 @@ jobs:
           shell: /bin/bash
           install: |
             apt-get update
+            apt-get install -y libunwind-dev sudo
             apt-get install -y \
                build-essential \
                clang \
@@ -1975,8 +1986,9 @@ jobs:
         run: |
           # install libarchive-tools for bsdtar command used in AppImageBuilder.yml
           sudo apt-get update -y
-          # https://github.com/AppImage/AppImageKit/wiki/FUSE
-          sudo apt-get install -y libarchive-tools libfuse2
+          sudo apt-get install -y libunwind-dev sudo libfuse2  
+          sudo apt-get update -y
+          sudo apt-get install -y libarchive-tools
           # set-up appimage-builder
           pushd /tmp
           wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
@@ -2059,6 +2071,7 @@ jobs:
           shell: /bin/bash
           install: |
             apt-get update -y
+            apt-get install -y libunwind-dev sudo wget
             apt-get install -y git flatpak flatpak-builder
           run: |
             # disable git safe.directory
@@ -2083,7 +2096,7 @@ jobs:
   build-rustdesk-web:
     if: False
     name: build-rustdesk-web
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
     env:
